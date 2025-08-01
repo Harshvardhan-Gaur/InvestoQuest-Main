@@ -1,0 +1,17 @@
+# Django
+db.sqlite3
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment
+venv/
+env/
+.venv/
+.env
+
+# Data files (like your 'returns' file)
+*.csv
+*.xlsx
