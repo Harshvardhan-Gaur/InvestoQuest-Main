@@ -7,9 +7,74 @@
 
 {% block content %}
 <div class="space-y-8">
+
+    <!-- Mean-Variance Optimization -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-extrabold underline underline-offset-4 decoration-yellow-700 text-yellow-700 mb-2">Mean-Variance Optimization (MVO)</h2>
+
+        <p>
+            Mean-Variance Optimization, introduced by Harry Markowitz in 1952, is a foundational framework in modern portfolio theory. It constructs a portfolio that either:
+        </p>
+        <ul class="list-disc list-inside ml-4">
+            <li>Minimizes risk for a given level of expected return</li>
+            <li>Maximizes expected return for a given level of risk</li>
+        </ul>
+
+        <p class="mt-4 font-semibold">Mathematical Formulation:</p>
+        <p>Let:</p>
+        <ul class="list-disc list-inside ml-4">
+            <li>\( \mathbf{w} = [w_1, w_2, \dots, w_n]^\top \): portfolio weights</li>
+            <li>\( \boldsymbol{\mu} = [\mu_1, \mu_2, \dots, \mu_n]^\top \): expected asset returns</li>
+            <li>\( \Sigma \): covariance matrix of asset returns</li>
+        </ul>
+
+        <p>
+            The portfolio's expected return is:
+            <br>
+            \( \mathbb{E}[R_p] = \mathbf{w}^\top \boldsymbol{\mu} \)
+        </p>
+
+        <p>
+            The portfolio's variance (risk) is:
+            <br>
+            \( \text{Var}(R_p) = \mathbf{w}^\top \Sigma \mathbf{w} \)
+        </p>
+
+        <p class="mt-4 font-semibold">Optimization Problem:</p>
+        <p>To minimize risk for a target return \( R_t \):</p>
+
+        <p><strong>Minimize:</strong> \( \mathbf{w}^\top \Sigma \mathbf{w} \)</p>
+
+        <p><strong>Subject to:</strong></p>
+        <ul class="list-disc list-inside ml-4">
+            <li>\( \mathbf{w}^\top \boldsymbol{\mu} = R_t \) (target return constraint)</li>
+            <li>\( \mathbf{w}^\top \mathbf{1} = 1 \) (weights sum to 1)</li>
+            <li>\( \mathbf{w} \geq 0 \) (no short-selling, optional)</li>
+        </ul>
+
+        <p class="mt-4">
+            This leads to a <strong>quadratic programming</strong> problem, whose solutions form the <em>efficient frontier</em> — a set of optimal portfolios balancing risk and return.
+        </p>
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% comment %} <!-- optimizer/templates/optimizer/know_the_models.html -->
+{% extends 'optimizer/base.html' %}
+
+{% block title %}Know the Models{% endblock %}
+
+{% block header %}Understanding Portfolio Optimization Models{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
     <Article -->
     <div class="bg-white p-6 rounded-lg shadow-md">
         
     </div>
 </div>
-{% endblock %}
+{% endblock %} {% endcomment %}
+
+
