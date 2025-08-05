@@ -5,7 +5,7 @@ from django import forms
 class PortfolioOptimizerForm(forms.Form):
     # Define the choices for the dropdown
     MODEL_CHOICES = [
-        ('mvo', 'Mean-Variance Optimization'),
+        ('mean_variance', 'Mean-Variance Optimization'),
         ('black_litterman', 'Black-Litterman Model'),
         ('risk_parity', 'Risk Parity')
     ]
@@ -25,3 +25,12 @@ class PortfolioOptimizerForm(forms.Form):
         widget=forms.Select(attrs={
                             'class': 'block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'})
     )
+
+    def clean_returns_file(self):
+        """
+        Validates that the uploaded file is a CSV.
+        """
+        file = self.cleaned_data.get('returns_file')
+        if not file.name.endswith('.csv'):
+            raise forms.ValidationError("Only CSV files are accepted.")
+        return file
