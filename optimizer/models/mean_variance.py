@@ -83,36 +83,62 @@ def mean_variance_optimization(price_df):
     buffer.seek(0)
     image_png = buffer.getvalue()
     plot_url = base64.b64encode(image_png).decode('utf-8')
-    img_html = f'<img src="data:image/png;base64,{plot_url}" alt="Efficient Frontier" class="mt-4"/>'
 
+    # Format weights into DataFrame
     weights_df = pd.DataFrame({
         'Ticker': tickers,
         'Weight': [f"{w:.2%}" for w in optimal_weights]
     })
-    weights_html = weights_df.to_html(
-        index=False, classes="table-auto w-full text-left whitespace-no-wrap")
 
+    # Convert DataFrame to HTML table with Tailwind classes
+    # weights_html = weights_df.to_html(
+    #     index=False,
+    #     classes="min-w-full divide-y divide-gray-200 text-sm text-gray-700"
+    # )
+    weights_html = f"""
+    <table class="min-w-full table-auto divide-y divide-gray-200 text-sm text-gray-800">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-2 text-left font-semibold">Ticker</th>
+                <th class="px-4 py-2 text-left font-semibold">Weight</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-100">
+            {''.join(f"<tr><td class='px-4 py-2 text-left'>{ticker}</td><td class='px-4 py-2 text-left'>{weight}</td></tr>" for ticker, weight in zip(tickers, [f'{w:.2%}' for w in optimal_weights]))}
+        </tbody>
+    </table>
+    """
+
+    # Full HTML output string
     html_output = f"""
     <div class="flex flex-col space-y-6 mt-6">
-        <!-- Portfolio Weights Table -->
-        <div class="overflow-x-auto">
-            <h2 class="text-lg font-semibold mb-2">Optimal Weights</h2>
-            {weights_html}
+
+        <!-- Optimal Weights Table -->
+        <div class="overflow-x-auto rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-3">Optimal Weights</h2>
+            <div class="bg-white overflow-hidden">
+                {weights_html}
+            </div>
         </div>
 
-        <!-- Summary Stats -->
-        <div class="bg-gray-100 p-4 rounded shadow">
-            <h2 class="text-lg font-semibold mb-2">Portfolio Summary</h2>
-            <p><strong>Expected Return:</strong> {optimal_return:.2%}</p>
-            <p><strong>Volatility:</strong> {optimal_volatility:.2%}</p>
-            <p><strong>Sharpe Ratio:</strong> {optimal_sharpe:.2f}</p>
+        <!-- Portfolio Summary -->
+        <div class="bg-gray-100 p-6 rounded shadow">
+            <h2 class="text-lg font-semibold mb-3">Portfolio Summary</h2>
+            <ul class="list-disc pl-6 text-gray-800">
+                <li><strong>Expected Return:</strong> {optimal_return:.2%}</li>
+                <li><strong>Volatility:</strong> {optimal_volatility:.2%}</li>
+                <li><strong>Sharpe Ratio:</strong> {optimal_sharpe:.2f}</li>
+            </ul>
         </div>
 
         <!-- Efficient Frontier Plot -->
-        <div>
-            <h2 class="text-lg font-semibold mb-2">Efficient Frontier</h2>
-            <img src="data:image/png;base64,{plot_url}" alt="Efficient Frontier" class="mt-2 rounded border border-gray-300 shadow" />
+        <div class="rounded-lg">
+            <h2 class="text-lg font-semibold mb-3">Efficient Frontier</h2>
+            <img src="data:image/png;base64,{plot_url}" 
+                alt="Efficient Frontier" 
+                class="w-full rounded border border-gray-300 shadow" />
         </div>
+
     </div>
     """
     return html_output
