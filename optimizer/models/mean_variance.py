@@ -1,13 +1,12 @@
+# optimizer/models/mean_variance.py
+
+from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
 import base64
 import matplotlib
-matplotlib.use('Agg')
-
-# optimizer/models/mean_variance.py
-
 matplotlib.use('Agg')
 
 
@@ -17,8 +16,9 @@ def mean_variance_optimization(price_df):
     mu = returns_df.mean() * 252
     cov = returns_df.cov() * 252
     tickers = returns_df.columns.tolist()
+    n_assets = len(tickers)
 
-    num_portfolios = 5000
+    num_portfolios = 100000
     results = np.zeros((3, num_portfolios))
     weights_record = []
 
@@ -39,11 +39,38 @@ def mean_variance_optimization(price_df):
     optimal_volatility = results[1, max_sharpe_idx]
     optimal_sharpe = results[2, max_sharpe_idx]
 
+    def portfolio_volatility(weights):
+        return np.sqrt(np.dot(weights.T, np.dot(cov, weights)))
+
+    def get_optimized_portfolio(target_return):
+        constraints = (
+            {'type': 'eq', 'fun': lambda w: np.sum(w) - 1},
+            {'type': 'eq', 'fun': lambda w: np.dot(w, mu) - target_return}
+        )
+        bounds = tuple((0, 1) for _ in range(n_assets))
+        result = minimize(portfolio_volatility,
+                          x0=np.ones(n_assets)/n_assets,
+                          method='SLSQP',
+                          bounds=bounds,
+                          constraints=constraints)
+        return result
+
+    target_returns = np.linspace(results[0].min(), results[0].max(), 100)
+    frontier_volatilities = []
+
+    for r in target_returns:
+        res = get_optimized_portfolio(r)
+        if res.success:
+            frontier_volatilities.append(portfolio_volatility(res.x))
+        else:
+            frontier_volatilities.append(np.nan)
+
     fig, ax = plt.subplots()
-    sc = ax.scatter(results[1, :], results[0, :],
-                    c=results[2, :], cmap='viridis', alpha=0.7)
+    sc = ax.scatter(results[1], results[0], c=results[2],
+                    cmap='viridis', alpha=0.6, label="Simulated Portfolios")
     ax.scatter(optimal_volatility, optimal_return, c='red',
                marker='*', s=150, label='Max Sharpe')
+
     ax.set_xlabel('Annualized Volatility')
     ax.set_ylabel('Annualized Return')
     ax.set_title('Efficient Frontier')
@@ -65,13 +92,38 @@ def mean_variance_optimization(price_df):
     weights_html = weights_df.to_html(
         index=False, classes="table-auto w-full text-left whitespace-no-wrap")
 
-    summary_html = f"""
-        <p><strong>Expected Return:</strong> {optimal_return:.2%}</p>
-        <p><strong>Volatility:</strong> {optimal_volatility:.2%}</p>
-        <p><strong>Sharpe Ratio:</strong> {optimal_sharpe:.2f}</p>
-    """
+    html_output = f"""
+    <div class="flex flex-col space-y-6 mt-6">
+        <!-- Portfolio Weights Table -->
+        <div class="overflow-x-auto">
+            <h2 class="text-lg font-semibold mb-2">Optimal Weights</h2>
+            {weights_html}
+        </div>
 
-    return weights_html + summary_html + img_html
+        <!-- Summary Stats -->
+        <div class="bg-gray-100 p-4 rounded shadow">
+            <h2 class="text-lg font-semibold mb-2">Portfolio Summary</h2>
+            <p><strong>Expected Return:</strong> {optimal_return:.2%}</p>
+            <p><strong>Volatility:</strong> {optimal_volatility:.2%}</p>
+            <p><strong>Sharpe Ratio:</strong> {optimal_sharpe:.2f}</p>
+        </div>
+
+        <!-- Efficient Frontier Plot -->
+        <div>
+            <h2 class="text-lg font-semibold mb-2">Efficient Frontier</h2>
+            <img src="data:image/png;base64,{plot_url}" alt="Efficient Frontier" class="mt-2 rounded border border-gray-300 shadow" />
+        </div>
+    </div>
+    """
+    return html_output
+
+    # summary_html = f"""
+    #     <p><strong>Expected Return:</strong> {optimal_return:.2%}</p>
+    #     <p><strong>Volatility:</strong> {optimal_volatility:.2%}</p>
+    #     <p><strong>Sharpe Ratio:</strong> {optimal_sharpe:.2f}</p>
+    # """
+
+    # return weights_html + summary_html + img_html
 
 
 # def mean_variance_optimization(returns_df):
