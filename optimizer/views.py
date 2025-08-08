@@ -98,4 +98,5 @@ def contact_us_view(request):
     """
     Renders the 'Contact Us' page.
     """
+
     return render(request, 'optimizer/contact_us.html')
