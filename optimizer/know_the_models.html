@@ -1,0 +1,88 @@
+<!-- optimizer/templates/optimizer/know_the_models.html -->
+{% extends 'optimizer/base.html' %}
+
+{% block title %}Know the Models{% endblock %}
+
+{% block header %}Understanding Portfolio Optimization Models{% endblock %}
+
+
+
+{% block content %}
+
+
+<div class="space-y-8">
+  <div class="bg-white p-6 rounded-lg shadow-md space-y-6">
+    <h1 class="text-3xl font-bold text-gray-800">🔍 Understanding HRP and HERC Portfolio Optimization</h1>
+
+    <div class="space-y-4">
+      <h2 class="text-xl font-semibold text-gray-700">📘 What is HRP (Hierarchical Risk Parity)?</h2>
+      <p>HRP is a modern portfolio allocation technique introduced by Marcos López de Prado. It solves some of the critical problems with traditional optimization models like mean-variance, especially instability due to matrix inversion.</p>
+      <details>
+        <summary class="font-medium cursor-pointer">Key Steps in HRP</summary>
+        <ul class="list-disc ml-6">
+          <li>1. Compute the correlation matrix</li>
+          <li>2. Convert to distance matrix: \( d_{i,j} = \sqrt{0.5 \cdot (1 - \rho_{i,j})} \)</li>
+          <li>3. Apply hierarchical clustering (e.g., Ward’s method)</li>
+          <li>4. Quasi-diagonalization: Reorders the covariance matrix</li>
+          <li>5. Recursive bisection: Allocates weights recursively</li>
+        </ul>
+      </details>
+      <details>
+        <summary class="font-medium cursor-pointer">Advantages of HRP</summary>
+        <ul class="list-disc ml-6">
+          <li>No need to invert the covariance matrix</li>
+          <li>More robust to outliers and noise</li>
+          <li>Handles large portfolios better</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="text-xl font-semibold text-gray-700">📘 What is HERC (Hierarchical Equal Risk Contribution)?</h2>
+      <p>HERC is an extension of HRP that incorporates the concept of Equal Risk Contribution into the allocation step. Instead of equal split, HERC ensures each cluster contributes equally to the total portfolio risk.</p>
+      <details>
+        <summary class="font-medium cursor-pointer">Key Steps in HERC</summary>
+        <ul class="list-disc ml-6">
+          <li>Follows same first 4 steps as HRP</li>
+          <li>Distributes risk contribution evenly across sub-clusters</li>
+          <li>Uses volatility or other risk metrics</li>
+        </ul>
+      </details>
+      <details>
+        <summary class="font-medium cursor-pointer">Advantages of HERC</summary>
+        <ul class="list-disc ml-6">
+          <li>Allocates based on actual risk contributions</li>
+          <li>Improves diversification when volatilities differ</li>
+          <li>Handles heterogeneity in asset behavior</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="text-xl font-semibold text-gray-700">🧠 Core Concepts and Attributes Used</h2>
+      <table class="table-auto w-full border border-gray-300 text-sm">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="border px-4 py-2 text-left">Attribute</th>
+            <th class="border px-4 py-2 text-left">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="border px-4 py-2"><code>Correlation Matrix</code></td><td class="border px-4 py-2">How assets move in relation to each other.</td></tr>
+          <tr><td class="border px-4 py-2"><code>Distance Matrix</code></td><td class="border px-4 py-2">Computed from correlation: <code>sqrt(0.5 * (1 - corr))</code></td></tr>
+          <tr><td class="border px-4 py-2"><code>Linkage</code></td><td class="border px-4 py-2">Clustering method (Ward, single, etc.)</td></tr>
+          <tr><td class="border px-4 py-2"><code>Quasi-diagonalization</code></td><td class="border px-4 py-2">Reorders covariance to group similar assets</td></tr>
+          <tr><td class="border px-4 py-2"><code>Recursive Bisection</code></td><td class="border px-4 py-2">Allocates weights cluster by cluster</td></tr>
+          <tr><td class="border px-4 py-2"><code>Equal Risk Contribution</code></td><td class="border px-4 py-2">In HERC, ensures equal cluster risk</td></tr>
+          <tr><td class="border px-4 py-2"><code>Covariance Matrix</code></td><td class="border px-4 py-2">Joint asset variability; needed to compute risk</td></tr>
+          <tr><td class="border px-4 py-2"><code>Volatility</code></td><td class="border px-4 py-2">Used in HERC to balance uneven clusters</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+
+{% endblock %}

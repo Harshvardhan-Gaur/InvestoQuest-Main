@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 import pandas as pd
 from .forms import PortfolioOptimizerForm # <-- UPDATED
-
+from .models import risk_parity
 # This decorator ensures that only logged-in users can access this page
 @login_required
 def welcome_view(request):
@@ -36,7 +36,8 @@ def portfolio_optimizer_view(request):
             try:
                 # Read the uploaded CSV file with pandas
                 df = pd.read_csv(returns_file)
-                
+                df = df.select_dtypes(include=['number'])  # Ensure only numeric columns are processed
+                df = df.dropna()  # Drop rows with NaN values
                 # --- ADD YOUR MODEL LOGIC HERE ---
                 # Based on the user's choice, run the appropriate model.
                 # The result should be stored in the 'results_html' variable.
@@ -49,6 +50,19 @@ def portfolio_optimizer_view(request):
                 elif selected_model == 'risk_parity':
                     # Call your risk_parity function with 'df'
                     # results_html = your_risk_parity_function(df)
+                    
+                    results_html, dendro_b64, heatmap_b64 = risk_parity(df)
+
+                    return render(request, 'optimizer/portfolio_optimizer.html', {
+                    'form': form,
+                    'optimization_results': results_html,
+                    'dendrogram_image': dendro_b64,
+                    'quasi_diag_image': heatmap_b64
+                    })
+
+        
+                    
+
                     results_html = df.head().to_html(classes='table-auto w-full text-left whitespace-no-wrap') + "<p class='mt-2 font-bold'>Processed with Risk Parity.</p>"
 
                 else:
